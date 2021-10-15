@@ -48,3 +48,5 @@ usage() {
     echo "        $0 <command_to_execute> <max_percentage_of_cpu_usage>"
     exit -1
 }
+
+main "$@"
