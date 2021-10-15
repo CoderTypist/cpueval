@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# Description:
+#     Run command with limited cpu usage
+# Arguments:
+#     $1: string command to execute
+#     $2: maximum percentage of cpu usage
+# Outputs:
+#     command output
+main() {
+
+    # make sure that 2 arguments are
+    if [ $# -lt 2 ]; then
+        usage
+    fi
+
+    # modify command to run in the background
+    command="$1 &"
+    percent="$2"
+
+    # run the command in the background
+    eval "$command"
+    pid="$!"
+
+    # print some child process information
+    jobs -l | grep "$pid"
+
+    # limit child process cpu usage
+    cpulimit --pid "$pid" --limit "$percent"
+
+    # kill the child process if the shell exits
+    trap "kill -9 $pid" EXIT
+
+    # wait for the child process to finish
+    wait "$pid"
+}
+
+# Description:
+#     Print script usage information
+# Arguments:
+#     n/a
+# Outputs:
+#     Usage information
+usage() {
+
+    echo ""
+    echo "    USAGE:"
+    echo "        $0 <command_to_execute> <max_percentage_of_cpu_usage>"
+    exit -1
+}
